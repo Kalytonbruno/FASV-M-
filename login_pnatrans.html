@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login PNATRANS - Informações do Município</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonte Inter do Google Fonts para visual SaaS moderno -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#FCFDF5',  // Cyber Light
+                            100: '#FAFFC7', // Cyber 100
+                            400: '#FFE600', // Cyber 400 (Hover/Neon)
+                            500: '#FFCC00', // Cyber 500 (Principal - Cyber Yellow)
+                            600: '#E6B800', // Cyber 600
+                            700: '#8A6E00', // Cyber 700
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC; /* Slate 50 - Fundo gelo clean */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Loader Moderno (Spinner minimalista em Cyber Yellow) */
+        .loader {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #0f172a; /* text-slate-900 */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex items-center justify-center min-h-screen relative overflow-hidden">
+    
+    <!-- Elementos Decorativos de Fundo (Blur) -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-400 opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-brand-500 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <main class="w-full max-w-3xl mx-auto p-4 sm:p-6 md:p-8 relative z-10">
+        
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center justify-center bg-white p-3 rounded-2xl shadow-sm border border-slate-100 mb-5">
+                <!-- Substitua o caminho da imagem pela sua logo oficial -->
+                <img src="imagem/logo-onsv.png" alt="Logo" class="h-10 w-auto object-contain" onerror="this.src='https://placehold.co/40x40/FFCC00/0f172a?text=L'">
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Informações do Município</h1>
+            <p class="text-sm sm:text-base text-slate-500 mt-3 font-medium">Preencha os dados abaixo para iniciar a autoavaliação.</p>
+        </header>
+
+        <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-soft border border-slate-200 relative overflow-hidden">
+            <!-- Barra superior decorativa do Card -->
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-brand-500"></div>
+
+            <form id="login-form">
+                
+                <!-- Aviso com Imagem de Fundo (Glassmorphism) -->
+                <div class="mb-8 relative overflow-hidden border border-brand-200 rounded-2xl p-5 shadow-sm">
+                    <!-- IMAGEM DE FUNDO DA CAIXA -->
+                    <div class="absolute inset-0 z-0">
+                        <img src="imagem/logo_onsv_login" alt="Fundo" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        <!-- Película (Overlay) para garantir que o texto fique legível sobre a foto -->
+                        <div class="absolute inset-0 bg-brand-50/85 backdrop-blur-[3px]"></div>
+                    </div>
+
+                    <!-- CONTEÚDO DA CAIXA (Elevado com z-10) -->
+                    <div class="relative z-10 flex items-start gap-4">
+                        <div class="bg-white/90 p-2.5 rounded-xl shadow-sm border border-white flex-shrink-0 mt-0.5">
+                            <svg class="h-5 w-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900 tracking-tight">Dados Iniciais</h2>
+                            <p class="text-sm text-slate-800 mt-1 leading-relaxed font-medium">Estas informações são protegidas e obrigatórias para gerar o seu plano de ação ao final do questionário.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="municipio" class="block text-sm font-medium text-slate-700 mb-1.5 flex justify-between">
+                            Município <span class="text-[10px] uppercase font-bold text-rose-500 tracking-wider bg-rose-50 px-1.5 py-0.5 rounded">Obrigatório</span>
+                        </label>
+                        <input type="text" id="municipio" name="municipio" required class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow outline-none shadow-sm placeholder:text-slate-400" placeholder="Nome completo do município">
+                    </div>
+
+                    <div>
+                        <label for="estado" class="block text-sm font-medium text-slate-700 mb-1.5 flex justify-between">
+                            Estado/UF <span class="text-[10px] uppercase font-bold text-rose-500 tracking-wider bg-rose-50 px-1.5 py-0.5 rounded">Obrigatório</span>
+                        </label>
+                        <select id="estado" name="estado" required class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow outline-none shadow-sm text-slate-700">
+                            <option value="">Selecione o estado</option>
+                            <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option><option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option><option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option><option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option><option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option><option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option><option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option><option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5 flex justify-between">
+                            E-mail de Contato <span class="text-[10px] uppercase font-bold text-rose-500 tracking-wider bg-rose-50 px-1.5 py-0.5 rounded">Obrigatório</span>
+                        </label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow outline-none shadow-sm placeholder:text-slate-400" placeholder="exemplo@email.com">
+                    </div>
+
+                    <div>
+                        <label for="telefone" class="block text-sm font-medium text-slate-700 mb-1.5 flex justify-between">
+                            Telefone / WhatsApp <span class="text-[10px] uppercase font-bold text-rose-500 tracking-wider bg-rose-50 px-1.5 py-0.5 rounded">Obrigatório</span>
+                        </label>
+                        <input type="tel" id="telefone" name="telefone" required class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow outline-none shadow-sm placeholder:text-slate-400" placeholder="(00) 00000-0000">
+                    </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 mt-10 pt-6 border-t border-slate-100">
+                    <button type="button" class="w-full sm:w-auto text-slate-500 hover:text-slate-900 font-medium py-3.5 px-6 rounded-xl hover:bg-slate-50 transition-colors">
+                        ← Voltar
+                    </button>
+                    <button id="submit-btn" type="submit" class="group relative flex items-center justify-center w-full sm:w-auto bg-brand-500 text-slate-900 font-bold py-3.5 px-8 rounded-xl hover:bg-brand-400 transition-all duration-300 shadow-soft hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                        <span id="button-text" class="flex items-center gap-2">
+                            Acessar Questionário
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </span>
+                        <div id="button-loader" class="loader hidden"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <footer class="text-center mt-10 text-slate-400 text-xs flex items-center justify-center gap-2">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <p>Seus dados são transmitidos de forma segura e criptografada via Supabase.</p>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Inicializa a conexão com o Supabase (Suas credenciais mantidas)
+        const SUPABASE_URL = "https://dodiijuzedniteeagbye.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvZGlpanV6ZWRuaXRlZWFnYnllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MTE0MDYsImV4cCI6MjA3NTA4NzQwNn0.wxhfS6pEjtcWFvKhvwIhIjLXMBiYg7j74SVnFAxDH4s";
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(event) {
+                    event.preventDefault(); 
+                    
+                    const form = event.target;
+                    const submitBtn = document.getElementById('submit-btn');
+                    const buttonText = document.getElementById('button-text');
+                    const buttonLoader = document.getElementById('button-loader');
+                    
+                    let isValid = true;
+                    let firstInvalidField = null;
+
+                    form.querySelectorAll('.error-message').forEach(el => el.remove());
+
+                    const requiredFields = ['municipio', 'estado', 'email', 'telefone'];
+                    
+                    requiredFields.forEach(fieldName => {
+                        const field = form[fieldName];
+                        if (field.value.trim() === '') {
+                            isValid = false;
+                            field.classList.add('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500');
+                            const error = document.createElement('p');
+                            error.className = 'text-rose-500 text-xs font-medium mt-1.5 error-message flex items-center gap-1';
+                            error.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Este campo é obrigatório.`;
+                            field.parentNode.appendChild(error);
+                            if (!firstInvalidField) firstInvalidField = field;
+                        } else {
+                            field.classList.remove('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500');
+                        }
+                    });
+
+                    if (!isValid) {
+                        if (firstInvalidField) firstInvalidField.focus();
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+                    buttonText.classList.add('hidden');
+                    buttonLoader.classList.remove('hidden');
+
+                    const nome_municipio = document.getElementById("municipio").value;                                    
+                    const uf_municipio = document.getElementById("estado").value;
+                    const email = document.getElementById("email").value;
+                    const telefone = document.getElementById("telefone").value;
+                    
+                    try {
+                        const { error, data: municipio } = await client
+                            .from("municipio")
+                            .insert([{ nome_municipio, uf_municipio, email, telefone }])
+                            .select();
+                        
+                        if (error) { throw error; }
+                        
+                        const municipioData = {
+                            id: municipio[0].id,
+                            nome: municipio[0].nome_municipio
+                        };
+                        
+                        sessionStorage.setItem('municipioInfo', JSON.stringify(municipioData));
+                        
+                        // IMPORTANTE: Este redirecionamento precisa apontar para o nome real do arquivo do seu questionário no VSCode.
+                        window.location.assign('./questionario_pnatrans.html'); 
+
+                    } catch (error) {
+                        // Modal de erro simplificado usando alert para manter a funcionalidade original
+                        alert("Ocorreu um erro ao cadastrar o município: " + error.message);
+                        console.error(error);
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                        buttonText.classList.remove('hidden');
+                        buttonLoader.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

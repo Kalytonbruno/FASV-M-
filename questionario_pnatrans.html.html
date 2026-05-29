@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário PNATRANS | Dashboard de Avaliação</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonte Inter do Google Fonts para visual SaaS moderno -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#FCFDF5',  // Cyber Light (Fundo super suave)
+                            100: '#FAFFC7', // Cyber 100
+                            400: '#FFE600', // Cyber 400 (Hover/Neon)
+                            500: '#FFCC00', // Cyber 500 (Principal - Cyber Yellow)
+                            600: '#E6B800', // Cyber 600
+                            700: '#8A6E00', // Cyber 700 (Para textos de apoio)
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos Base */
+        body {
+            background-color: #F8FAFC; /* Slate 50 - Fundo gelo clean */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animação para blocos estratégicos */
+        .strategic-block {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .strategic-block.visible {
+            max-height: 2000px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 1.5rem;
+        }
+
+        /* Estilização Avançada dos Radios (SaaS Style) */
+        .custom-radio-label {
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            border-color: #e2e8f0; /* slate-200 */
+            color: #64748b; /* slate-500 */
+        }
+        
+        .custom-radio-label:hover {
+            border-color: #cbd5e1; /* slate-300 */
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        /* Estado "Checked" usando a pseudo-classe :has adaptado para Cyber Yellow */
+        .custom-radio-label:has(input:checked) {
+            background-color: #FCFDF5; /* brand-50 */
+            border-color: #FFCC00; /* brand-500 */
+            color: #0f172a; /* slate-900 (Contraste forte com amarelo) */
+            box-shadow: 0 0 0 1px #FFCC00;
+        }
+
+        .custom-radio-label:has(input:checked) svg {
+            color: #E6B800; /* brand-600 */
+        }
+
+        /* Loader Moderno (Spinner minimalista) */
+        .loader {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #FFCC00; /* brand-500 */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .loader-large {
+            width: 40px;
+            height: 40px;
+            border-width: 4px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar customizada para área de resultados */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header Fixo Estilo SaaS -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-100 p-2 rounded-lg flex items-center justify-center">
+                    <!-- Substituído o SVG pela Logo -->
+                    <img src="imagem/sua-logo-header.png" alt="Logo Cabeçalho" class="h-6 w-6 object-contain" onerror="this.src='https://placehold.co/24x24/FFCC00/0f172a?text=L'">
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 tracking-tight leading-none">Avaliação PNATRANS</h1>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">Indicadores de Segurança Viária</p>
+                </div>
+            </div>
+            <div class="hidden sm:block">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                    <span class="w-2 h-2 mr-1.5 bg-green-500 rounded-full"></span>
+                    Sistema Operacional
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl mt-4">
+        
+        <main>
+            <form id="pnatrans-form" class="space-y-8">
+                
+                <!-- Card de Boas-Vindas / Contexto -->
+                <div class="relative p-6 sm:p-10 rounded-2xl shadow-card border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden min-h-[140px]">
+                    
+                    <!-- IMAGEM DE FUNDO -->
+                    <div class="absolute inset-0 z-0">
+                        <img src="imagem/plano de fundo.png" alt="Background" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        <!-- Degradê para garantir que o texto fique legível sobre qualquer foto -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-white/40 sm:to-transparent"></div>
+                    </div>
+
+                    <!-- Textos (Elevados com z-10 para ficarem acima do fundo) -->
+                    <div class="relative z-10 max-w-lg">
+                        <h2 class="text-2xl font-bold text-slate-900">Formulário de Coleta</h2>
+                        <p id="municipio-display" class="text-sm text-slate-700 mt-2 flex items-center gap-2 font-medium">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            Carregando dados do município...
+                        </p>
+                    </div>
+                    
+                    <!-- ESPAÇO PARA AS IMAGENS DO ONSV (Com fundo translúcido estilo vidro) -->
+                    <div class="relative z-10 flex items-center gap-4 bg-white/70 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/50">
+                        <!-- Imagem 1: Ex: Logo do ONSV -->
+                        <img src="imagem/logo-onsv.png" alt="Logo ONSV" class="h-10 w-auto object-contain" onerror="this.src='https://placehold.co/120x40/FFCC00/0f172a?text=LOGO+ONSV'">
+                        
+                        <!-- Imagem 2: Ex: Logo do Maio Amarelo (ou parceiros) -->
+                        <img src="imagem/logo-maio-amarelo.png" alt="Logo Maio Amarelo" class="h-10 w-auto object-contain hidden sm:block" onerror="this.src='https://placehold.co/120x40/f8fafc/0f172a?text=MAIO+AMARELO'">
+                    </div>
+                </div>
+                
+                <!-- Container Principal Dinâmico -->
+                <div id="questionnaire-container" class="space-y-10">
+                    <!-- Loading State -->
+                    <div class="bg-white p-12 rounded-2xl shadow-card border border-slate-200 text-center flex flex-col items-center justify-center">
+                        <div class="loader loader-large mb-4"></div>
+                        <h3 class="text-lg font-medium text-slate-800">Preparando questionário</h3>
+                        <p class="text-sm text-slate-500 mt-1">Conectando ao banco de dados...</p>
+                    </div>
+                </div>
+
+                <!-- Botão de Ação Principal -->
+                <div class="pt-8 pb-12 flex justify-center border-t border-slate-200 mt-10">
+                    <button id="submit-btn" type="button" class="group relative flex items-center justify-center w-full sm:w-auto bg-brand-500 text-slate-900 font-bold py-3.5 px-8 rounded-xl hover:bg-brand-400 transition-all duration-300 shadow-soft hover:shadow-lg transform hover:-translate-y-0.5 text-base border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                        <span id="button-text" class="flex items-center gap-2">
+                            Gerar Painel de Resultados
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </span>
+                        <div id="button-loader" class="loader hidden !border-t-slate-900"></div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Dashboard de Resultados (Plano de Ação) -->
+            <div id="action-plan-container" class="mt-8 hidden animate-[fadeIn_0.5s_ease-out]">
+                <div class="flex flex-col items-center mb-8">
+                    <span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">Concluído</span>
+                    <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Seu Plano de Ação</h2>
+                    <p class="text-slate-500 mt-2 text-center max-w-xl">Com base nas suas respostas, geramos um painel executivo com os próximos passos recomendados para o município.</p>
+                </div>
+
+                <div id="plan-results" class="bg-transparent space-y-6">
+                    <!-- O conteúdo gerado entrará aqui com os novos estilos -->
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-16 pb-8 text-slate-400 text-xs flex flex-col items-center justify-center gap-2">
+            <svg class="h-5 w-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p>Desenvolvido com base nas diretrizes do Observatório Nacional de Segurança Viária e UFPR.</p>
+        </footer>
+    </div>
+
+    <!-- Script do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- INÍCIO DO JAVASCRIPT ---
+        const SUPABASE_URL = "https://dodiijuzedniteeagbye.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvZGlpanV6ZWRuaXRlZWFnYnllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MTE0MDYsImV4cCI6MjA3NTA4NzQwNn0.wxhfS6pEjtcWFvKhvwIhIjLXMBiYg7j74SVnFAxDH4s";
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let formSchema = [];
+
+        // 2. MONTAR FORMULÁRIO (NOVO LAYOUT SAAS)
+        function renderQuestionnaire() {
+            const container = document.getElementById('questionnaire-container');
+            if (!container) return;
+            container.innerHTML = ''; 
+            
+            const groupedByPilar = formSchema.reduce((acc, q) => {
+                if (!acc[q.pilar]) acc[q.pilar] = {};
+                if (!acc[q.pilar][q.tema]) acc[q.pilar][q.tema] = [];
+                acc[q.pilar][q.tema].push(q);
+                return acc;
+            }, {});
+
+            for (const pilarName in groupedByPilar) {
+                const pilarSection = document.createElement('div');
+                pilarSection.className = 'mb-12';
+                
+                // Header do Pilar
+                const pilarHeader = document.createElement('div');
+                pilarHeader.className = 'flex items-center gap-3 mb-6';
+                pilarHeader.innerHTML = `
+                    <div class="h-8 w-1 bg-brand-500 rounded-full"></div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">${pilarName}</h2>
+                `;
+                pilarSection.appendChild(pilarHeader);
+
+                for (const temaName in groupedByPilar[pilarName]) {
+                    const temaCard = document.createElement('div');
+                    // Design do Card Moderno
+                    temaCard.className = 'bg-white p-6 sm:p-8 rounded-2xl shadow-card border border-slate-200 mb-6';
+                    
+                    const temaTitle = document.createElement('h3');
+                    temaTitle.className = 'text-lg font-semibold text-slate-900 border-b border-slate-100 pb-4 mb-5 flex justify-between items-center';
+                    temaTitle.innerHTML = `
+                        <span>${temaName}</span>
+                        <span class="text-xs font-medium bg-slate-100 text-slate-500 py-1 px-2.5 rounded-md">Tema</span>
+                    `;
+                    temaCard.appendChild(temaTitle);
+
+                    const questions = groupedByPilar[pilarName][temaName];
+                    const basicQuestions = questions.filter(q => q.level === 'basic');
+                    const strategicQuestions = questions.filter(q => q.level === 'strategic');
+
+                    const questionsWrapper = document.createElement('div');
+                    questionsWrapper.className = 'space-y-6';
+
+                    basicQuestions.forEach(q => {
+                        questionsWrapper.appendChild(createQuestionElement(q));
+                    });
+                    
+                    temaCard.appendChild(questionsWrapper);
+
+                    if (strategicQuestions.length > 0) {
+                        const groupedStrategics = strategicQuestions.reduce((acc, sq) => {
+                            const key = (sq.show_if ? (Array.isArray(sq.show_if) ? sq.show_if.join('-') : sq.show_if) : sq.id);
+                            if (!acc[key]) acc[key] = [];
+                            acc[key].push(sq);
+                            return acc;
+                        }, {});
+
+                        for (const key in groupedStrategics) {
+                            const questionsInGroup = groupedStrategics[key];
+                            
+                            const strategicContainer = document.createElement('div');
+                            strategicContainer.id = `strategic-container-${key}`;
+                            // Bloco estratégico com design glassmorphism/sutil
+                            strategicContainer.className = 'strategic-block bg-slate-50/50 border border-slate-200 rounded-xl p-5 sm:p-6';
+                            
+                            const strategicBadge = `
+                                <div class="mb-5 flex items-center gap-2">
+                                    <svg class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-purple-700">Aprofundamento Estratégico</span>
+                                </div>
+                            `;
+                            strategicContainer.innerHTML = strategicBadge;
+                            
+                            const stratQuestionsWrapper = document.createElement('div');
+                            stratQuestionsWrapper.className = 'space-y-6';
+                            questionsInGroup.forEach(q => { 
+                                stratQuestionsWrapper.appendChild(createQuestionElement(q));
+                            });
+                            strategicContainer.appendChild(stratQuestionsWrapper);
+
+                            // Aviso Redesenhado
+                            const warningMessage = document.createElement('div');
+                            warningMessage.id = `warning-${key}`;
+                            warningMessage.className = "hidden mt-6 bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start gap-3";
+                            warningMessage.innerHTML = `
+                                <svg class="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-amber-800">Atenção</h4>
+                                    <p class="text-sm text-amber-700 mt-1">Como o requisito básico não foi atendido, as ações estratégicas deste tópico serão incluídas automaticamente no seu Plano de Ação.</p>
+                                </div>
+                            `;
+
+                            temaCard.appendChild(warningMessage);
+                            temaCard.appendChild(strategicContainer);
+                        }
+                    }
+                    pilarSection.appendChild(temaCard);
+                }
+                container.appendChild(pilarSection);
+            }
+        }
+
+        // 3. CRIAR CADA PERGUNTA (NOVO HTML/CSS)
+        function createQuestionElement(question) {
+            const questionWrapper = document.createElement('div');
+            
+            let inputHtml = '';
+            // Título da pergunta refinado
+            const questionTitle = `<label class="block text-[15px] font-medium text-slate-700 mb-3 leading-snug">${question.text_pt}</label>`;
+
+            if (question.type === 'boolean') {
+                // Radio Buttons Estilo Toggle/Cards
+                inputHtml = `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="custom-radio-label flex items-center cursor-pointer p-3 border-2 rounded-xl">
+                            <input type="radio" name="${question.id}" value="true" class="sr-only">
+                            <div class="flex items-center justify-center h-5 w-5 rounded-full border border-current mr-3 flex-shrink-0 relative">
+                                <div class="h-2.5 w-2.5 rounded-full bg-current opacity-0 transition-opacity absolute"></div>
+                            </div>
+                            <span class="font-medium text-sm">Sim, aplicável</span>
+                        </label>
+                        <label class="custom-radio-label flex items-center cursor-pointer p-3 border-2 rounded-xl">
+                            <input type="radio" name="${question.id}" value="false" class="sr-only">
+                            <div class="flex items-center justify-center h-5 w-5 rounded-full border border-current mr-3 flex-shrink-0 relative">
+                                <div class="h-2.5 w-2.5 rounded-full bg-current opacity-0 transition-opacity absolute"></div>
+                            </div>
+                            <span class="font-medium text-sm">Não se aplica</span>
+                        </label>
+                    </div>
+                `;
+            } else if (question.type === 'integer' || question.type === 'text') { 
+                 let placeholder = question.type === 'integer' ? 'Ex: 10' : 'Descreva a situação atual...';
+                 let maxWidth = question.type === 'integer' ? 'max-w-[200px]' : 'w-full';
+                 // Input SaaS Style
+                 inputHtml = `
+                    <input type="text" name="${question.id}" 
+                        class="block ${maxWidth} bg-white px-4 py-2.5 text-sm text-slate-900 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow outline-none shadow-sm placeholder:text-slate-400" 
+                        placeholder="${placeholder}">
+                 `;
+            }
+
+            questionWrapper.innerHTML = questionTitle + inputHtml;
+            
+            // Lógica simples para animar a "bolinha" do rádio customizado
+            if(question.type === 'boolean') {
+                setTimeout(() => {
+                    const radios = questionWrapper.querySelectorAll('input[type="radio"]');
+                    radios.forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            const parentGrid = e.target.closest('.grid');
+                            parentGrid.querySelectorAll('.bg-current').forEach(dot => dot.classList.add('opacity-0'));
+                            e.target.parentElement.querySelector('.bg-current').classList.remove('opacity-0');
+                        });
+                    });
+                }, 0);
+            }
+
+            return questionWrapper;
+        }
+        
+        // 4. LÓGICA CONDICIONAL (MANTIDA)
+        function handleConditionalLogic() {
+            const dependenciesMap = new Map();
+            formSchema.filter(q => q.level === 'strategic' && q.show_if).forEach(q => {
+                const key = Array.isArray(q.show_if) ? q.show_if.join('-') : q.show_if;
+                if (key && !dependenciesMap.has(key)) {
+                    dependenciesMap.set(key, Array.isArray(q.show_if) ? q.show_if : [q.show_if]);
+                }
+            });
+
+            dependenciesMap.forEach((basicDependencies, key) => {
+                const allBasicsTrue = basicDependencies.every(id => document.querySelector(`input[name="${id}"][value="true"]`)?.checked);
+                const anyBasicAnsweredFalse = basicDependencies.some(id => document.querySelector(`input[name="${id}"][value="false"]`)?.checked);
+                
+                const strategicContainer = document.getElementById(`strategic-container-${key}`);
+                const warningMessage = document.getElementById(`warning-${key}`);
+
+                if (strategicContainer && warningMessage) {
+                    if (allBasicsTrue) {
+                        strategicContainer.classList.add('visible');
+                    } else {
+                        strategicContainer.classList.remove('visible');
+                    }
+                    
+                    if (anyBasicAnsweredFalse && !allBasicsTrue) {
+                        warningMessage.classList.remove('hidden');
+                    } else {
+                        warningMessage.classList.add('hidden');
+                    }
+                }
+            });
+        }
+        
+        // 5. GERAR E SALVAR (MANTIDO)
+        async function generateAndSaveActionPlan(event) {
+            const submitBtn = document.getElementById('submit-btn');
+            const buttonText = document.getElementById('button-text');
+            const buttonLoader = document.getElementById('button-loader');
+            
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            buttonText.classList.add('hidden');
+            buttonLoader.classList.remove('hidden');
+
+            try {
+                const form = document.getElementById('pnatrans-form');
+                const formData = new FormData(form);
+                const answers = Object.fromEntries(formData.entries());
+                
+                const municipioInfo = JSON.parse(sessionStorage.getItem('municipioInfo'));
+                if (!municipioInfo || !municipioInfo.id) {
+                    alert("Erro: ID do município não encontrado. Por favor, volte à página de login.");
+                    return; 
+                }
+
+                generateAndRenderPlan(answers); 
+
+                const responsesToSave = [];
+                for (const questionId in answers) {
+                    const question = formSchema.find(q => q.id === questionId);
+                    if (question) {
+                        let record = {
+                            municipio_id: municipioInfo.id,
+                            question_id: questionId,
+                            resposta_text: null,
+                            resposta_numero: null,
+                            resposta_boolean: null
+                        };
+
+                        const answerValue = answers[questionId];
+
+                        if (question.type === 'boolean') {
+                            record.resposta_boolean = (answerValue === 'true');
+                        } else if (question.type === 'integer') {
+                            const parsedNumber = parseInt(answerValue, 10);
+                            if (!isNaN(parsedNumber) && String(parsedNumber) === answerValue) {
+                                record.resposta_numero = parsedNumber;
+                            } else {
+                                record.resposta_text = answerValue;
+                            }
+                        } else { 
+                            record.resposta_text = answerValue;
+                        }
+                        responsesToSave.push(record);
+                    }
+                }
+                
+                const { error } = await client.from('respostas_pnatrans').insert(responsesToSave);
+                if (error) throw error; 
+
+            } catch (error) {
+                console.error("Erro no processo:", error);
+                alert("Ocorreu um erro ao salvar suas respostas.\n" + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                buttonText.classList.remove('hidden');
+                buttonLoader.classList.add('hidden');
+            }
+        }
+
+        // 6. GERAR PLANO (MANTIDA)
+        function generateAndRenderPlan(answers) {
+            const plan = [];
+            const answeredBasics = {};
+
+            formSchema.forEach(q => {
+                if (q.level === 'basic') {
+                    let answer = false;
+                    if (answers.hasOwnProperty(q.id)) {
+                        if (q.type === 'boolean') answer = answers[q.id] === 'true';
+                        else if (['integer', 'text'].includes(q.type)) {
+                            const value = answers[q.id];
+                            answer = value && value.trim() !== ''; 
+                        }
+                    }
+                    answeredBasics[q.id] = answer;
+                }
+            });
+
+            formSchema.forEach(q => {
+                 let status = 'APLICAR';
+                 let details = '';
+                 if (q.level === 'basic') {
+                     if (q.type === 'boolean') {
+                        status = answeredBasics[q.id] ? 'OK' : 'APLICAR';
+                    } else if (['integer', 'text'].includes(q.type)) {
+                        const answerValue = answers.hasOwnProperty(q.id) ? answers[q.id] : '';
+                        status = (answerValue && (parseInt(answerValue, 10) > 0 || (q.type === 'text' && answerValue.trim() !== ''))) ? 'OK' : 'APLICAR';
+                    }
+                 } else { 
+                    const dependencyArray = q.show_if ? (Array.isArray(q.show_if) ? q.show_if : [q.show_if]) : [];
+                    const areBasicsOk = dependencyArray.every(id => answeredBasics[id]);
+                    
+                    if (!areBasicsOk) {
+                        details = 'Requisito básico pendente. Ação incluída como prioritária.';
+                    } else {
+                        if (answers.hasOwnProperty(q.id)) {
+                            if (q.type === 'boolean') {
+                                status = (answers[q.id] === 'true') ? 'OK' : 'APLICAR';
+                            } else if (['integer', 'text'].includes(q.type)) {
+                                const value = answers[q.id] || '';
+                                status = (value.trim() !== '' && (parseInt(value,10) > 0 || (q.type === 'text' && value.trim() !== ''))) ? 'OK' : 'APLICAR';
+                                details = value ? `Status reportado: "${value}"` : '';
+                            }
+                        } else { 
+                             status = 'APLICAR';
+                        }
+                    }
+                 }
+                 plan.push({ action_text: q.action_text, status, details, pilar: q.pilar, level: q.level, cronologia: q.cronologia });
+            });
+            
+            renderPlanUI(plan);
+        }
+        
+        // 7. DESENHAR UI DO PLANO (NOVO LAYOUT DASHBOARD)
+        function renderPlanUI(plan) {
+            const container = document.getElementById('action-plan-container');
+            const resultsDiv = document.getElementById('plan-results');
+            if (!container || !resultsDiv) return;
+            
+            const municipioInfo = JSON.parse(sessionStorage.getItem('municipioInfo') || '{}');
+            const municipioName = municipioInfo.nome || 'Dados Atuais';
+
+            const groupedByPilar = plan.reduce((acc, action) => {
+                (acc[action.pilar] = acc[action.pilar] || []).push(action);
+                return acc;
+            }, {});
+
+            resultsDiv.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-8 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-slate-500 font-medium">Relatório gerado para</p>
+                        <h3 class="text-xl font-bold text-slate-900">${municipioName}</h3>
+                    </div>
+                    <div class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center">
+                        <svg class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                </div>
+            `;
+
+            for(const pilarName in groupedByPilar) {
+                let pilarActions = groupedByPilar[pilarName];
+
+                pilarActions.sort((a, b) => {
+                    const cronA = a.cronologia || '99.99';
+                    const cronB = b.cronologia || '99.99';
+                    return cronA.localeCompare(cronB, undefined, { numeric: true });
+                });
+
+                const actionsToApply = pilarActions.filter(a => a.status === 'APLICAR');
+                const actionsOk = pilarActions.filter(a => a.status === 'OK');
+
+                // Card do Pilar no Dashboard
+                const pilarCard = document.createElement('div');
+                pilarCard.className = 'bg-white rounded-2xl shadow-card border border-slate-200 overflow-hidden';
+                
+                const pilarHeader = `
+                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                        <h4 class="text-lg font-bold text-slate-800">${pilarName}</h4>
+                        <div class="flex gap-2">
+                            <span class="px-2.5 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded-md">${actionsToApply.length} Pendentes</span>
+                            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md">${actionsOk.length} Concluídas</span>
+                        </div>
+                    </div>
+                `;
+                
+                let contentHtml = '<div class="p-6 space-y-8">';
+                
+                if (actionsToApply.length > 0) {
+                    contentHtml += `
+                        <div>
+                            <h5 class="flex items-center gap-2 text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">
+                                <span class="h-2 w-2 rounded-full bg-rose-500"></span> 
+                                Ações Prioritárias
+                            </h5>
+                            <div class="space-y-3">
+                                ${actionsToApply.map(action => createActionListItem(action)).join('')}
+                            </div>
+                        </div>`;
+                }
+
+                if (actionsOk.length > 0) { 
+                    contentHtml += `
+                        <div>
+                            <h5 class="flex items-center gap-2 text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500"></span> 
+                                Pontos Fortes (Atendidos)
+                            </h5>
+                            <div class="space-y-3">
+                                ${actionsOk.map(action => createActionListItem(action)).join('')}
+                            </div>
+                        </div>`;
+                }
+                
+                contentHtml += '</div>';
+                pilarCard.innerHTML = pilarHeader + contentHtml;
+                resultsDiv.appendChild(pilarCard);
+            }
+
+            container.classList.remove('hidden');
+            // Timeout para garantir que o render terminou antes de rolar a tela
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Criar o item da lista visual estilo SaaS
+        function createActionListItem(action) {
+            const isOk = action.status === 'OK';
+            const iconBg = isOk ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600';
+            const iconSvg = isOk 
+                ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />' 
+                : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />';
+            
+            const levelBadgeColor = action.level === 'basic' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200';
+            const levelText = action.level === 'basic' ? 'Básico' : 'Estratégico';
+
+            return `
+                <div class="flex items-start p-4 rounded-xl border ${isOk ? 'border-slate-100 bg-slate-50/50' : 'border-slate-200 bg-white shadow-sm'} transition-all hover:border-slate-300">
+                    <div class="flex-shrink-0 mt-0.5 h-8 w-8 flex items-center justify-center rounded-lg ${iconBg}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            ${iconSvg}
+                        </svg>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <p class="text-sm font-medium ${isOk ? 'text-slate-600' : 'text-slate-900'} leading-relaxed">${action.action_text}</p>
+                        <div class="flex flex-wrap items-center gap-2 mt-2">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${levelBadgeColor}">
+                                ${levelText}
+                            </span>
+                            ${action.details ? `<span class="text-xs text-slate-500 flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>${action.details}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async function() {
+            const municipioInfo = JSON.parse(sessionStorage.getItem('municipioInfo') || '{}');
+            const municipioDisplay = document.getElementById('municipio-display');
+            if (municipioDisplay) {
+                if (municipioInfo.nome) {
+                    municipioDisplay.innerHTML = `
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Preenchendo para: <strong class="text-slate-700 ml-1">${municipioInfo.nome}</strong>`;
+                } else {
+                    municipioDisplay.innerHTML = `Ambiente de testes. Nenhuma cidade vinculada.`;
+                }
+            }
+
+            const { data, error } = await client.from('perguntas_pnatrans').select('*').order('id');
+            
+            if (error || !data || data.length === 0) {
+                document.getElementById('questionnaire-container').innerHTML = `
+                    <div class="bg-rose-50 p-6 rounded-xl border border-rose-200 text-center">
+                        <svg class="h-10 w-10 text-rose-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <h3 class="text-rose-800 font-bold">Erro ao carregar os dados</h3>
+                        <p class="text-rose-600 text-sm mt-1">Verifique as permissões do banco de dados.</p>
+                    </div>`;
+                return;
+            }
+
+            formSchema = data;
+            renderQuestionnaire();
+
+            document.getElementById('pnatrans-form').addEventListener('change', handleConditionalLogic);
+            document.getElementById('submit-btn').addEventListener('click', generateAndSaveActionPlan); 
+        });
+    </script>
+</body>
+</html>
